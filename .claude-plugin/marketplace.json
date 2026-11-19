@@ -38,6 +38,21 @@
         "automation",
         "tools"
       ]
+    },
+    {
+      "name": "aws",
+      "source": "./plugins/aws",
+      "description": "Set up and check AWS services for small web apps: SES transactional email (DKIM, MAIL FROM, DMARC, sandbox, least-privilege IAM, mailer, checks).",
+      "version": "0.1.0",
+      "category": "development",
+      "keywords": [
+        "aws",
+        "ses",
+        "email",
+        "dkim",
+        "dmarc",
+        "iam"
+      ]
     }
   ]
 }
