@@ -12,14 +12,18 @@
     {
       "name": "security",
       "source": "./plugins/security",
-      "description": "Security hardening skills for web apps and servers (nginx SPA security headers / CSP).",
-      "version": "0.1.0",
+      "description": "Security hardening and review skills for web apps and servers: nginx SPA security headers / CSP, and an outside-in production deployment audit.",
+      "version": "0.2.0",
       "category": "security",
       "keywords": [
         "security",
         "nginx",
         "csp",
-        "headers"
+        "headers",
+        "deployment",
+        "audit",
+        "cloudflare",
+        "tls"
       ]
     },
     {

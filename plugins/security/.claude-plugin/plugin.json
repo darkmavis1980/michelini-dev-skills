@@ -1,9 +1,18 @@
 {
   "name": "security",
-  "description": "Security hardening skills for web apps and servers.",
-  "version": "0.1.0",
+  "description": "Security hardening and review skills for web apps and the servers that host them.",
+  "version": "0.2.0",
   "author": {
     "name": "Alessio Michelini"
   },
-  "keywords": ["security", "nginx", "csp", "headers"]
+  "keywords": [
+    "security",
+    "nginx",
+    "csp",
+    "headers",
+    "deployment",
+    "audit",
+    "cloudflare",
+    "tls"
+  ]
 }

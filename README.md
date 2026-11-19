@@ -47,4 +47,4 @@ Group related things into one plugin (e.g. `frontend`, `cloudflare`, `git-workfl
 
 | Plugin | What it does |
 | --- | --- |
-| `security` | Security hardening: `nginx-spa-security-headers` (CSP + security headers for nginx-served SPAs). |
+| `security` | Security hardening and review: `nginx-spa-security-headers` (CSP + security headers for nginx-served SPAs), `deployment-audit` (read-only outside-in audit of a live site plus its deployment files, with a dated report). |
