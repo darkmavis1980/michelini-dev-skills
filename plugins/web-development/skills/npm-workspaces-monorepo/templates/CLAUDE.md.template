@@ -1,0 +1,77 @@
+# CLAUDE.md
+
+Instructions for Claude Code in this repository. Keep this file to always-needed essentials.
+Put feature-area detail in `docs/reference/` and link it from the table at the end.
+
+## What this is
+
+<One paragraph: what the product is, who uses it, the production domain(s).>
+
+`CONTEXT.md` is the domain glossary. Read it before naming anything new.
+For an architecture overview, read `docs/mental-model.md`.
+
+## Hard rules
+
+- **Never run migrations** (`migrate:up`, `migrate:down`, or any migration command). They touch
+  whatever database `.env` points at. Write the migration file and tell the user the command.
+- **Never commit or push.** The user does both. Staged files or new commits during a session are theirs.
+- **Look up package versions with context7** (`resolve-library-id` then `query-docs`) before adding
+  or updating a library, and pin the exact latest patch (`^8.0.7`, not `^8.0.0`).
+
+## Repo layout
+
+npm workspaces under `apps/`:
+
+- `apps/server`: Express 5 API, TypeScript (ESM), runs via `tsx`, port 3001
+- `apps/client`: <framework>, port <port>
+- `apps/admin`: Vite + React 19 admin SPA, static build served by nginx, port 5174
+- `apps/mcp-server`: Cloudflare Worker exposing the public API as MCP tools
+
+Root `package.json` has `"overrides"` pinning one React 19 instance across the tree. Never move an
+app out of `apps/`. Install dependencies from the root: `npm install <pkg> -w apps/<name>`.
+
+## Dev workflow
+
+```bash
+docker compose up -d db   # Postgres only (DB_EXPOSE_PORT=5432 to reach it from the host)
+npm install               # all workspaces, from the root
+npm run dev               # server (:3001) + client + admin
+```
+
+Production-like: `docker compose up --build` (client on :8079, admin on :8078).
+
+**Checks** that must stay green:
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+```
+
+## Server conventions
+
+- Routes are thin: zod-validate, call a service, respond. Business logic and every DB query live
+  in `apps/server/src/services/`. No DB access in route files.
+- Services throw `AppError(message, status)` (`src/errors.ts`); the global error handler maps it.
+- Zod v4 top-level formats: `z.uuid()`, `z.email()`, `z.url()`, `z.iso.datetime()`.
+- Tests in `apps/server/tests/` mirroring `src/`. Not under `src/`, not in `__tests__`.
+- Migrations: `apps/server/migrations/YYYYMMDDhhmmss_snake_case.ts`, `up`/`down`, scaffold with
+  `npm run migrate:create <name>` from `apps/server`. Backward compatible with the running code.
+- **Env vars go in three places**: `apps/server/.env.sample`, `apps/server/.env.docker` and
+  `ecosystem.config.sample.js`. PM2 is the only env source in production.
+
+## Decisions and plans
+
+- `docs/adr/`: decision records (the why). Read the relevant ADR before changing what it covers.
+- `docs/plans/`: implementation plans. Write new plans there so they can be executed independently.
+
+## Reference docs
+
+| File | Covers |
+| --- | --- |
+| `docs/reference/deployment.md` | PM2 + nginx production, release workflow, Docker |
+
+## Memory
+
+Session memory is kept in the Claude Code memory directory for this project. Read its `MEMORY.md`
+index at the start of a session and load the entries that are relevant.
