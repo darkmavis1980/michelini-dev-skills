@@ -1,0 +1,8 @@
+{
+  "name": "my-plugin",
+  "description": "What this plugin does.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Alessio Michelini"
+  }
+}
