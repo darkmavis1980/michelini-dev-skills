@@ -29,14 +29,18 @@
     {
       "name": "dev-workflow",
       "source": "./plugins/dev-workflow",
-      "description": "Development workflow automation and tools.",
-      "version": "0.1.0",
+      "description": "Development workflow tools: mental-model architecture docs, step-by-step plans with review stops, versioned agent-instruction snippets for CLAUDE.md / AGENTS.md, and a Plain English (ELI5 + ASD-STE-100) output style.",
+      "version": "0.2.0",
       "category": "development",
       "keywords": [
         "development",
         "workflow",
-        "automation",
-        "tools"
+        "planning",
+        "architecture",
+        "claude-md",
+        "agents-md",
+        "snippets",
+        "output-style"
       ]
     },
     {
@@ -60,8 +64,8 @@
     {
       "name": "web-development",
       "source": "./plugins/web-development",
-      "description": "Conventions and tools for full-stack TypeScript npm-workspaces monorepos (Express 5 + Kysely + Postgres, Vite/Next frontends) deployed to a VPS with PM2 + nginx: monorepo scaffolding, API conventions, env var sync check, release pipeline, and an opt-in guard hook that blocks migrations and git commit/push.",
-      "version": "0.1.0",
+      "description": "Conventions and tools for full-stack TypeScript npm-workspaces monorepos (Express 5 + Kysely + Postgres, Vite/Next frontends) deployed to a VPS with PM2 + nginx: monorepo scaffolding, API conventions, env var sync check, release pipeline, Markdown for agents (Accept: text/markdown negotiation), and an opt-in guard hook that blocks migrations and git commit/push.",
+      "version": "0.2.0",
       "category": "development",
       "keywords": [
         "monorepo",
@@ -73,7 +77,11 @@
         "pm2",
         "nginx",
         "deployment",
-        "env"
+        "env",
+        "markdown",
+        "content-negotiation",
+        "llms-txt",
+        "agents"
       ]
     }
   ]
