@@ -42,8 +42,8 @@
     {
       "name": "aws",
       "source": "./plugins/aws",
-      "description": "Set up and check AWS services for small web apps: SES transactional email (DKIM, MAIL FROM, DMARC, sandbox, least-privilege IAM, mailer, checks).",
-      "version": "0.1.0",
+      "description": "Set up and check AWS services for small web apps: SES transactional email (DKIM, MAIL FROM, DMARC, sandbox, least-privilege IAM, mailer, checks) and private S3 buckets (setup, read-back checks, presigned uploads/downloads, least-privilege IAM).",
+      "version": "0.2.0",
       "category": "development",
       "keywords": [
         "aws",
@@ -51,7 +51,10 @@
         "email",
         "dkim",
         "dmarc",
-        "iam"
+        "iam",
+        "s3",
+        "bucket",
+        "presigned-urls"
       ]
     }
   ]

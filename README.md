@@ -48,4 +48,4 @@ Group related things into one plugin (e.g. `frontend`, `cloudflare`, `git-workfl
 | Plugin | What it does |
 | --- | --- |
 | `security` | Security hardening and review: `nginx-spa-security-headers` (CSP + security headers for nginx-served SPAs), `deployment-audit` (read-only outside-in audit of a live site plus its deployment files, with a dated report). |
-| `aws` | AWS setup and checks: `ses-transactional-email` (SES for an app's transactional email: DKIM, MAIL FROM, DMARC, sandbox, send-only IAM, mailer example, check scripts). |
+| `aws` | AWS setup and checks: `ses-transactional-email` (SES for an app's transactional email: DKIM, MAIL FROM, DMARC, sandbox, send-only IAM, mailer example, check scripts), `s3-private-bucket` (private bucket setup and read-back checks, presigned uploads/downloads, least-privilege IAM). |
