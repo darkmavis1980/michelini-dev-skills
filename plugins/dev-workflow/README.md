@@ -16,7 +16,7 @@ Development workflow skills, reusable agent-instruction snippets, and an output 
 
 ## Requirements
 
-Node.js 18+ for `snippet.mjs`.
+Node.js 24+ for `snippet.mjs`.
 
 ## Install
 
