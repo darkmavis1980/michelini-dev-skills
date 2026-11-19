@@ -1,0 +1,20 @@
+{
+  "name": "web-development",
+  "description": "Conventions and tools for full-stack TypeScript npm-workspaces monorepos (Express 5 + Kysely + Postgres, Vite/Next frontends) deployed to a VPS with PM2 + nginx: monorepo scaffolding, API conventions, env var sync check, release pipeline, and an opt-in guard hook that blocks migrations and git commit/push.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Alessio Michelini"
+  },
+  "keywords": [
+    "monorepo",
+    "npm-workspaces",
+    "express",
+    "kysely",
+    "postgres",
+    "github-actions",
+    "pm2",
+    "nginx",
+    "deployment",
+    "env"
+  ]
+}
