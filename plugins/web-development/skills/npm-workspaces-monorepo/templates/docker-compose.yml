@@ -1,0 +1,61 @@
+# Production-like local stack: docker compose up --build
+# Local dev with hot reload instead: docker compose up -d db && npm run dev
+services:
+  db:
+    # Plain postgres:17-alpine if the app doesn't use pgvector.
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: <db>
+      POSTGRES_USER: <db>
+      POSTGRES_PASSWORD: <db> # local only; production uses its own credentials
+    ports:
+      # Empty by default (random host port). Set DB_EXPOSE_PORT=5432 to reach it from npm run dev.
+      - '${DB_EXPOSE_PORT:-}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U <db> -d <db>']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Optional. The app should fail open (treat cache misses as normal) when Redis is down.
+  # redis:
+  #   image: redis:7-alpine
+  #   restart: unless-stopped
+  #   ports:
+  #     - '${REDIS_EXPOSE_PORT:-}:6379'
+
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    restart: unless-stopped
+    env_file: ./apps/server/.env.docker # DB_HOST=db, not localhost
+    depends_on:
+      db:
+        condition: service_healthy
+
+  client:
+    build:
+      context: .
+      dockerfile: apps/client/Dockerfile
+    restart: unless-stopped
+    ports:
+      - '8079:80'
+    depends_on:
+      - server
+
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    restart: unless-stopped
+    ports:
+      - '8078:80'
+    depends_on:
+      - server
+
+volumes:
+  pgdata:

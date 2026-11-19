@@ -1,0 +1,29 @@
+{
+  "name": "<project>",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:server": "npm --workspace apps/server run dev",
+    "dev:client": "npm --workspace apps/client run dev",
+    "dev:admin": "npm --workspace apps/admin run dev",
+    "dev": "concurrently -n server,client,admin -c blue,green,magenta \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:admin\"",
+    "build": "npm --workspace apps/client run build && npm --workspace apps/admin run build",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm test --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:changed": "git diff --name-only HEAD | xargs prettier --write --ignore-unknown"
+  },
+  "devDependencies": {
+    "concurrently": "<latest>",
+    "prettier": "<latest>"
+  },
+  "overrides": {
+    "react": "<latest-19>",
+    "react-dom": "<latest-19>"
+  }
+}

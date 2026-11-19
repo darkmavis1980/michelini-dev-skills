@@ -1,0 +1,11 @@
+node_modules
+apps/*/node_modules
+apps/*/dist
+apps/*/build
+apps/client/.next
+**/.env
+**/.env.*
+!**/.env.docker
+!**/.env.sample
+.git
+docs

@@ -14,12 +14,13 @@ else
 fi
 
 echo "Installing dependencies (lockfile only)"
-npm ci
+# --include=dev: build tools (vite, tsx) are devDependencies, and a NODE_ENV=production shell would skip them.
+npm ci --include=dev
 
 echo "Building static apps"
 # One line per app nginx serves, or `npm run build` if the root script builds them all.
-npm run build --workspace <apps/client>
-npm run build --workspace <apps/admin>
+npm run build --workspace apps/client
+npm run build --workspace apps/admin
 
 echo "Running migrations (old server still serving)"
 # Migrations must work with the old code too: if this fails, set -e stops here and the
