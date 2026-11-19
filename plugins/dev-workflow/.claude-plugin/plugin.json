@@ -1,9 +1,18 @@
 {
   "name": "dev-workflow",
-  "description": "Development workflow automation and tools.",
-  "version": "0.1.0",
+  "description": "Development workflow tools: mental-model architecture docs, step-by-step plans with review stops, versioned agent-instruction snippets for CLAUDE.md / AGENTS.md, and a Plain English (ELI5 + ASD-STE-100) output style.",
+  "version": "0.2.0",
   "author": {
     "name": "Alessio Michelini"
   },
-  "keywords": ["development", "workflow", "automation", "tools"]
+  "keywords": [
+    "development",
+    "workflow",
+    "planning",
+    "architecture",
+    "claude-md",
+    "agents-md",
+    "snippets",
+    "output-style"
+  ]
 }
