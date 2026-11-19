@@ -1,0 +1,34 @@
+name: PR Checks
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+# A new push to the same PR cancels the older run.
+concurrency:
+  group: pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: ${{ matrix.workspace }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # One entry per app. Each step runs only if that workspace has the script.
+        workspace: [apps/server, apps/client, apps/admin, apps/mcp-server]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck --workspace ${{ matrix.workspace }} --if-present
+      - run: npm run lint --workspace ${{ matrix.workspace }} --if-present
+      - run: npm test --workspace ${{ matrix.workspace }} --if-present
+      - run: npm run build --workspace ${{ matrix.workspace }} --if-present
