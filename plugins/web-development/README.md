@@ -29,7 +29,7 @@ When it blocks a command, Claude gets a message saying why and what to do instea
 
 ## Requirements
 
-- Node.js 18+ for the hook and `check-env-sync.mjs`; `bash` and `curl` for `check-markdown.sh`. If `node` is missing the hook fails open (doesn't block).
+- Node.js 24+ for the hook and `check-env-sync.mjs`; `bash` and `curl` for `check-markdown.sh`. If `node` is missing the hook fails open (doesn't block).
 
 ## Install
 
