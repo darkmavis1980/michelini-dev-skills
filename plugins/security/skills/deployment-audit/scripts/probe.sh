@@ -29,7 +29,7 @@ done
 
 UA="deployment-audit/1.0 (read-only)"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
-NFAIL=0; NWARN=0
+NFAIL=0; NWARN=0; SEEN_SERVER=""; SEEN_POWERED=""
 pass() { echo "PASS  $*"; }
 warn() { echo "WARN  $*"; NWARN=$((NWARN + 1)); }
 fail() { echo "FAIL  $*"; NFAIL=$((NFAIL + 1)); }
@@ -141,7 +141,7 @@ check_headers() { # <label> <path> <kind: page|api|asset>
   if [ -z "$missing" ]; then pass "$label ($path, $STATUS): security headers present"
   elif header cf-cache-status | grep -qi hit || header x-cache | grep -qi hit; then
     # A CDN may still hold a copy cached before the headers were added: ask the origin directly.
-    local cached="$missing"; check_headers_origin=1
+    local cached="$missing"
     fetch GET "$BASE$path?audit-nocache=$$"
     if [ -n "$(header x-content-type-options)" ] && { [ -n "$(header content-security-policy)" ] || [ -n "$(header x-frame-options)" ]; }; then
       warn "$label ($path): the CDN-cached copy lacks$cached, but the origin sends them — purge the CDN cache (or wait for the next build)"
@@ -150,8 +150,10 @@ check_headers() { # <label> <path> <kind: page|api|asset>
     fi
   elif [ "$kind" = asset ]; then warn "$label ($path, $STATUS): missing$missing"
   else fail "$label ($path, $STATUS): missing$missing"; fi
-  v=$(header server); echo "$v" | grep -Eq '[0-9]+\.[0-9]+' && warn "$label: Server header discloses a version ($v)"
-  v=$(header x-powered-by); [ -n "$v" ] && warn "$label: X-Powered-By discloses '$v'"
+  v=$(header server)
+  if echo "$v" | grep -Eq '[0-9]+\.[0-9]+' && [ -z "$SEEN_SERVER" ]; then warn "Server header discloses a version ($v): server_tokens off"; SEEN_SERVER=1; fi
+  v=$(header x-powered-by)
+  if [ -n "$v" ] && [ -z "$SEEN_POWERED" ]; then warn "X-Powered-By discloses '$v' (on $path)"; SEEN_POWERED=1; fi
   return 0
 }
 section "Security headers"
@@ -203,13 +205,14 @@ section "Cookies"
 seen=0
 for p in / ${API:+"$API"}; do
   fetch GET "$BASE$p"
-  grep -i '^set-cookie:' "$TMP/h" | cut -d: -f2- | while read -r c; do
+  while read -r c; do
+    [ -n "$c" ] || continue
     name=${c%%=*}; flags=$(echo "$c" | lower); miss=""
     echo "$flags" | grep -q '; *secure' || miss="$miss Secure"
     echo "$flags" | grep -q '; *httponly' || miss="$miss HttpOnly"
     echo "$flags" | grep -q '; *samesite' || miss="$miss SameSite"
-    if [ -z "$miss" ]; then echo "PASS  cookie '$name' on $p: Secure, HttpOnly, SameSite"; else echo "WARN  cookie '$name' on $p: missing$miss (fine only if JavaScript must read it)"; fi
-  done
+    if [ -z "$miss" ]; then pass "cookie '$name' on $p: Secure, HttpOnly, SameSite"; else warn "cookie '$name' on $p: missing$miss (fine only if JavaScript must read it)"; fi
+  done < <(grep -i '^set-cookie:' "$TMP/h" | cut -d: -f2-)
   grep -qi '^set-cookie:' "$TMP/h" && seen=1
 done
 [ $seen = 0 ] && info "no cookies set without signing in (sign-in cookies can't be checked from outside; check them in the code)"
