@@ -1,0 +1,9 @@
+{
+  "name": "security",
+  "description": "Security hardening skills for web apps and servers.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Alessio Michelini"
+  },
+  "keywords": ["security", "nginx", "csp", "headers"]
+}
