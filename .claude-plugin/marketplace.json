@@ -1,0 +1,26 @@
+{
+  "name": "michelini-dev-skills",
+  "owner": {
+    "name": "Alessio Michelini"
+  },
+  "metadata": {
+    "description": "Personal collection of Claude Code skills, MCP servers and hooks.",
+    "version": "0.1.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "security",
+      "source": "./plugins/security",
+      "description": "Security hardening skills for web apps and servers (nginx SPA security headers / CSP).",
+      "version": "0.1.0",
+      "category": "security",
+      "keywords": [
+        "security",
+        "nginx",
+        "csp",
+        "headers"
+      ]
+    }
+  ]
+}
