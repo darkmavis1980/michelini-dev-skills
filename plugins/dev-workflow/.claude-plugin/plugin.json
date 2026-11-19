@@ -1,0 +1,9 @@
+{
+  "name": "dev-workflow",
+  "description": "Development workflow automation and tools.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Alessio Michelini"
+  },
+  "keywords": ["development", "workflow", "automation", "tools"]
+}
