@@ -1,0 +1,12 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "SendAppEmailOnly",
+      "Effect": "Allow",
+      "Action": "ses:SendEmail",
+      "Resource": "arn:aws:ses:__REGION__:__ACCOUNT_ID__:identity/__DOMAIN__",
+      "Condition": { "StringEquals": { "ses:FromAddress": "__FROM_ADDRESS__" } }
+    }
+  ]
+}

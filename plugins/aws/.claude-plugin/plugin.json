@@ -1,0 +1,9 @@
+{
+  "name": "aws",
+  "description": "Skills for setting up and checking AWS services used by small web apps (SES transactional email).",
+  "version": "0.1.0",
+  "author": {
+    "name": "Alessio Michelini"
+  },
+  "keywords": ["aws", "ses", "email", "dkim", "dmarc", "iam"]
+}
