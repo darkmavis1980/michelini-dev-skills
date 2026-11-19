@@ -8,8 +8,8 @@ A personal [Claude Code plugin marketplace](https://code.claude.com/docs/en/plug
 # from a local checkout
 /plugin marketplace add ~/Code/michelini-dev-skills
 
-# or from the git remote (needs SSH access to the server)
-/plugin marketplace add git@192.168.68.197:darkmavis1980/michelini-dev-skills.git
+# or from GitHub
+/plugin marketplace add darkmavis1980/michelini-dev-skills
 
 # then install a plugin
 /plugin install security@michelini-dev-skills
