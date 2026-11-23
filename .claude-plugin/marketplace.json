@@ -64,8 +64,8 @@
     {
       "name": "web-development",
       "source": "./plugins/web-development",
-      "description": "Conventions and tools for full-stack TypeScript npm-workspaces monorepos (Express 5 + Kysely + Postgres, Vite/Next frontends) deployed to a VPS with PM2 + nginx: monorepo scaffolding, API conventions, env var sync check, release pipeline, Markdown for agents (Accept: text/markdown negotiation), and an opt-in guard hook that blocks migrations and git commit/push.",
-      "version": "0.2.0",
+      "description": "Conventions and tools for full-stack TypeScript npm-workspaces monorepos (Express 5 + Kysely + Postgres, Vite/Next frontends) deployed to a VPS with PM2 + nginx: monorepo scaffolding, API conventions, env var sync check, release pipeline, deploys to a self-hosted server over Tailscale (Docker Compose), Markdown for agents (Accept: text/markdown negotiation), and an opt-in guard hook that blocks migrations and git commit/push.",
+      "version": "0.3.0",
       "category": "development",
       "keywords": [
         "monorepo",
@@ -81,7 +81,10 @@
         "markdown",
         "content-negotiation",
         "llms-txt",
-        "agents"
+        "agents",
+        "tailscale",
+        "self-hosted",
+        "docker-compose"
       ]
     }
   ]

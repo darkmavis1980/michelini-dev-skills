@@ -1,0 +1,96 @@
+# Paste this job under `jobs:` in the workflow that already runs the checks (for example
+# .github/workflows/ci.yml). Replace every <placeholder>:
+#   <check-job>    the job that must pass first (build / test)
+#   <environment>  the GitHub Environment name: qa, staging, preview…
+#   <trigger-ref>  the ref that may deploy: refs/heads/main, or use startsWith(github.ref, 'refs/tags/v')
+#   <deploy-script> path of templates/deploy.sh in the repo, e.g. scripts/deploy-compose.sh
+# All settings live in the Environment, so the same names work for every environment.
+# Look up the current majors of actions/checkout and tailscale/github-action before pinning.
+
+  deploy-<environment>:
+    name: Deploy to <environment>
+    needs: <check-job>
+    # A manual run from another branch must not deploy.
+    if: github.ref == '<trigger-ref>'
+    runs-on: ubuntu-latest
+    environment:
+      name: <environment>
+    concurrency:
+      group: deploy-<environment>
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write # Tailscale workload identity federation (OIDC)
+    env:
+      DEPLOY_ENV: <environment>
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_SSH_PORT: ${{ vars.DEPLOY_SSH_PORT }}
+      DEPLOY_SSH_USER: ${{ vars.DEPLOY_SSH_USER }}
+      DEPLOY_APP_PATH: ${{ vars.DEPLOY_APP_PATH }}
+      DEPLOY_HTTP_PORT: ${{ vars.DEPLOY_HTTP_PORT }}
+      DEPLOY_COMPOSE_PROJECT: ${{ vars.DEPLOY_COMPOSE_PROJECT }}
+      DEPLOY_SHA: ${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # full history, so the push below is not shallow
+
+      - name: Check deploy settings
+        run: |
+          fail() { echo "::error::$1"; exit 1; }
+          [[ "$DEPLOY_HOST" =~ ^[A-Za-z0-9.-]+$ ]] || fail "DEPLOY_HOST is missing or invalid"
+          [[ "$DEPLOY_SSH_PORT" =~ ^[0-9]{1,5}$ ]] || fail "DEPLOY_SSH_PORT is missing or invalid"
+          [[ "$DEPLOY_SSH_USER" =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || fail "DEPLOY_SSH_USER is missing or invalid"
+          [[ "$DEPLOY_APP_PATH" =~ ^/[A-Za-z0-9._/-]+$ && "$DEPLOY_APP_PATH" != *..* ]] || fail "DEPLOY_APP_PATH is missing or invalid"
+          [[ "$DEPLOY_HTTP_PORT" =~ ^[0-9]{4,5}$ ]] || fail "DEPLOY_HTTP_PORT is missing or invalid"
+          [[ "$DEPLOY_COMPOSE_PROJECT" =~ ^[a-z0-9][a-z0-9_-]{0,62}$ ]] || fail "DEPLOY_COMPOSE_PROJECT is missing or invalid"
+          [[ "$DEPLOY_SHA" =~ ^[0-9a-f]{40}$ ]] || fail "Unexpected commit SHA"
+
+      - name: Join the tailnet
+        uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          audience: ${{ secrets.TS_AUDIENCE }}
+          tags: tag:ci
+          ping: ${{ vars.DEPLOY_HOST }}
+
+      - name: Set up SSH
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Push the commit to the server
+        run: |
+          # The server's clone may not be able to fetch this commit (private repo, or its
+          # origin is another remote). Push it over the same SSH connection to a private ref.
+          # ${DEPLOY_SHA} has braces on purpose: "$DEPLOY_SHA:refs" breaks in zsh (:r modifier).
+          GIT_SSH_COMMAND="ssh -i $HOME/.ssh/deploy_key -p $DEPLOY_SSH_PORT -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=20" \
+            git push --force "$DEPLOY_SSH_USER@$DEPLOY_HOST:$DEPLOY_APP_PATH" "${DEPLOY_SHA}:refs/deploy/${DEPLOY_ENV}"
+
+      - name: Deploy
+        id: deploy
+        run: |
+          # Inputs were validated above, so plain quoting is safe in the remote command.
+          ssh -i ~/.ssh/deploy_key -p "$DEPLOY_SSH_PORT" \
+            -o StrictHostKeyChecking=yes -o BatchMode=yes -o ConnectTimeout=20 \
+            "$DEPLOY_SSH_USER@$DEPLOY_HOST" \
+            "bash -s -- '$DEPLOY_APP_PATH' '$DEPLOY_SHA' '$DEPLOY_HTTP_PORT' '$DEPLOY_COMPOSE_PROJECT'" \
+            < <deploy-script>
+
+      - name: Show container logs on failure
+        # Only when the deploy itself failed; earlier failures have no server to ask.
+        if: failure() && steps.deploy.outcome == 'failure'
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$DEPLOY_SSH_PORT" -o StrictHostKeyChecking=yes -o BatchMode=yes \
+            "$DEPLOY_SSH_USER@$DEPLOY_HOST" \
+            "cd '$DEPLOY_APP_PATH' && docker compose -p '$DEPLOY_COMPOSE_PROJECT' ps && docker compose -p '$DEPLOY_COMPOSE_PROJECT' logs --tail 100" || true
+
+      - name: Remove SSH key
+        if: always()
+        run: rm -rf ~/.ssh
